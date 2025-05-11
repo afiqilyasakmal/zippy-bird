@@ -1,11 +1,13 @@
 // Game constants
+const BASE_WIDTH = 360;
+const BASE_HEIGHT = 640;
 const GRAVITY = 0.5;
 const FLAP_SPEED = -8;
 const PIPE_SPEED = 2;
 const PIPE_SPAWN_INTERVAL = 1500;
-const BIRD_SIZE = 50;
-const PIPE_WIDTH = 80;
-const PIPE_GAP = 200;
+let BIRD_SIZE = 50;
+let PIPE_WIDTH = 80;
+let PIPE_GAP = 200;
 
 // Game assets
 const assets = {
@@ -104,7 +106,24 @@ async function init() {
         }
         canvas.width = width;
         canvas.height = height;
-        // Optionally, scale all game objects here if needed
+        // Calculate scaling factors
+        let scaleX = width / BASE_WIDTH;
+        let scaleY = height / BASE_HEIGHT;
+        let scale = Math.min(scaleX, scaleY);
+        // Dynamically scale game constants
+        BIRD_SIZE = 50 * scale;
+        PIPE_WIDTH = 80 * scale;
+        PIPE_GAP = 200 * scaleY;
+        // Update bird size
+        bird.width = BIRD_SIZE;
+        bird.height = BIRD_SIZE;
+        // Optionally, reposition bird if needed
+        bird.x = 60 * scaleX;
+        // Update pipe positions if needed
+        pipes.forEach(pipe => {
+            pipe.x = pipe.x * scaleX;
+            pipe.gapY = pipe.gapY * scaleY;
+        });
     }
     
     // Initial resize and add listener for window changes
@@ -237,18 +256,13 @@ function handlePause() {
 
 function draw() {
     if (!assets.background || !assets.bird || !assets.pipe || !assets.ground) return;
-
     // Draw background
     ctx.drawImage(assets.background, 0, 0, canvas.width, canvas.height);
-    
     // Draw bird
     ctx.drawImage(assets.bird, bird.x, bird.y, bird.width, bird.height);
-    
     // Draw pipes
     pipes.forEach(pipe => {
-        // Draw top pipe
         ctx.drawImage(assets.pipe, pipe.x, 0, PIPE_WIDTH, pipe.gapY);
-        // Draw bottom pipe
         ctx.drawImage(
             assets.pipe,
             pipe.x,
@@ -257,81 +271,72 @@ function draw() {
             canvas.height - (pipe.gapY + PIPE_GAP)
         );
     });
-    
     // Draw ground
-    ctx.drawImage(assets.ground, 0, canvas.height - 100, canvas.width, 100);
-    
+    ctx.drawImage(assets.ground, 0, canvas.height - 100 * (canvas.height / BASE_HEIGHT), canvas.width, 100 * (canvas.height / BASE_HEIGHT));
     // Draw credit at the bottom center
-    ctx.font = `16px ${assets.font}`;
+    ctx.font = `${16 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
     ctx.textAlign = 'center';
     ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 * (canvas.height / BASE_HEIGHT);
     ctx.fillStyle = '#fff';
     const creditText = 'by Afiq Ilyasa Akmal';
-    const creditY = canvas.height - 30;
+    const creditY = canvas.height - 30 * (canvas.height / BASE_HEIGHT);
     ctx.strokeText(creditText, canvas.width / 2, creditY);
     ctx.fillText(creditText, canvas.width / 2, creditY);
-    
     // Draw score
-    ctx.font = `20px ${assets.font}`;
+    ctx.font = `${20 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
     ctx.textAlign = 'left';
     ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3 * (canvas.height / BASE_HEIGHT);
     ctx.fillStyle = '#fff';
-    ctx.strokeText(`Score: ${score}`, 10, 30);
-    ctx.fillText(`Score: ${score}`, 10, 30);
-    ctx.strokeText(`High Score: ${highScore}`, 10, 60);
-    ctx.fillText(`High Score: ${highScore}`, 10, 60);
-    
+    ctx.strokeText(`Score: ${score}`, 10 * (canvas.width / BASE_WIDTH), 30 * (canvas.height / BASE_HEIGHT));
+    ctx.fillText(`Score: ${score}`, 10 * (canvas.width / BASE_WIDTH), 30 * (canvas.height / BASE_HEIGHT));
+    ctx.strokeText(`High Score: ${highScore}`, 10 * (canvas.width / BASE_WIDTH), 60 * (canvas.height / BASE_HEIGHT));
+    ctx.fillText(`High Score: ${highScore}`, 10 * (canvas.width / BASE_WIDTH), 60 * (canvas.height / BASE_HEIGHT));
     // Draw game over message
     if (gameOver) {
-        ctx.font = `32px ${assets.font}`;
+        ctx.font = `${32 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3 * (canvas.height / BASE_HEIGHT);
         ctx.fillStyle = '#fff';
         ctx.strokeText('Game Over!', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
-        ctx.font = `16px ${assets.font}`;
-        ctx.strokeText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40);
-        ctx.fillText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40);
+        ctx.font = `${16 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
+        ctx.strokeText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
+        ctx.fillText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
     }
-    
     // Draw start message
     if (!gameStarted) {
-        // Draw the title in two rows above the start message
-        ctx.font = `32px ${assets.font}`;
+        ctx.font = `${32 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 4 * (canvas.height / BASE_HEIGHT);
         ctx.fillStyle = '#fff';
-        // First row: "ZIPPY"
-        ctx.strokeText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90);
-        ctx.fillText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90);
-        // Second row: "BIRD"
-        ctx.strokeText('BIRD', canvas.width / 2, canvas.height / 2 - 50);
-        ctx.fillText('BIRD', canvas.width / 2, canvas.height / 2 - 50);
-        // Draw the start message below the title
-        ctx.font = `20px ${assets.font}`;
-        ctx.lineWidth = 3;
+        ctx.strokeText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90 * (canvas.height / BASE_HEIGHT));
+        ctx.fillText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90 * (canvas.height / BASE_HEIGHT));
+        ctx.strokeText('BIRD', canvas.width / 2, canvas.height / 2 - 50 * (canvas.height / BASE_HEIGHT));
+        ctx.fillText('BIRD', canvas.width / 2, canvas.height / 2 - 50 * (canvas.height / BASE_HEIGHT));
+        ctx.font = `${20 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
+        ctx.lineWidth = 3 * (canvas.height / BASE_HEIGHT);
         ctx.strokeText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
     }
     // Draw pause overlay
     if (pause) {
-        ctx.font = `32px ${assets.font}`;
+        ctx.font = `${32 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3 * (canvas.height / BASE_HEIGHT);
         ctx.fillStyle = '#fff';
         ctx.strokeText('Paused', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Paused', canvas.width / 2, canvas.height / 2);
     }
     if (pauseCountdown > 0) {
-        ctx.font = `48px ${assets.font}`;
+        ctx.font = `${48 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 4 * (canvas.height / BASE_HEIGHT);
         ctx.fillStyle = '#fff';
         ctx.strokeText(pauseCountdown, canvas.width / 2, canvas.height / 2);
         ctx.fillText(pauseCountdown, canvas.width / 2, canvas.height / 2);
