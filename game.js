@@ -206,27 +206,38 @@ function draw() {
     ctx.drawImage(assets.ground, 0, canvas.height - 100, canvas.width, 100);
     
     // Draw score
-    ctx.fillStyle = '#000';
     ctx.font = `20px ${assets.font}`;
     ctx.textAlign = 'left';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    ctx.fillStyle = '#fff';
+    ctx.strokeText(`Score: ${score}`, 10, 30);
     ctx.fillText(`Score: ${score}`, 10, 30);
+    ctx.strokeText(`High Score: ${highScore}`, 10, 60);
     ctx.fillText(`High Score: ${highScore}`, 10, 60);
     
     // Draw game over message
     if (gameOver) {
-        ctx.fillStyle = '#000';
         ctx.font = `32px ${assets.font}`;
         ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 3;
+        ctx.fillStyle = '#fff';
+        ctx.strokeText('Game Over!', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
         ctx.font = `16px ${assets.font}`;
+        ctx.strokeText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40);
         ctx.fillText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40);
     }
     
     // Draw start message
     if (!gameStarted) {
-        ctx.fillStyle = '#000';
         ctx.font = `20px ${assets.font}`;
         ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 3;
+        ctx.fillStyle = '#fff';
+        ctx.strokeText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
     }
 }
