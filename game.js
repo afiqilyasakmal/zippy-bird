@@ -220,6 +220,17 @@ function draw() {
     // Draw ground
     ctx.drawImage(assets.ground, 0, canvas.height - 100, canvas.width, 100);
     
+    // Draw credit at the bottom center
+    ctx.font = `16px ${assets.font}`;
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.fillStyle = '#fff';
+    const creditText = 'by Afiq Ilyasa Akmal';
+    const creditY = canvas.height - 30;
+    ctx.strokeText(creditText, canvas.width / 2, creditY);
+    ctx.fillText(creditText, canvas.width / 2, creditY);
+    
     // Draw score
     ctx.font = `20px ${assets.font}`;
     ctx.textAlign = 'left';
