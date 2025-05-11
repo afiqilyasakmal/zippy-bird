@@ -156,7 +156,7 @@ function spawnPipe() {
 
 // Update game state
 function update() {
-    if (!gameStarted || pause || pauseCountdown > 0) return;
+    if (!gameStarted || pause) return;
 
     // Update bird position
     bird.velocity += GRAVITY;
@@ -214,22 +214,7 @@ function update() {
 // Draw game objects
 function handlePause() {
     if (gameOver || !gameStarted) return;
-    if (!pause) {
-        pause = true;
-        pauseCountdown = 0;
-        clearInterval(pauseCountdownInterval);
-    } else {
-        // Start countdown before resuming
-        pauseCountdown = 3;
-        pauseCountdownInterval = setInterval(() => {
-            pauseCountdown--;
-            if (pauseCountdown <= 0) {
-                clearInterval(pauseCountdownInterval);
-                pause = false;
-                pauseCountdown = 0;
-            }
-        }, 1000);
-    }
+    pause = !pause;
 }
 
 function draw() {
@@ -315,17 +300,14 @@ function draw() {
         ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
     }
     // Draw pause overlay
-    if (pause && pauseCountdown === 0) {
+    if (pause) {
         ctx.font = `32px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 3;
         ctx.fillStyle = '#fff';
-        ctx.strokeText('Paused', canvas.width / 2, canvas.height / 2 - 20);
-        ctx.fillText('Paused', canvas.width / 2, canvas.height / 2 - 20);
-        ctx.font = `16px ${assets.font}`;
-        ctx.strokeText('Press P again to resume', canvas.width / 2, canvas.height / 2 + 20);
-        ctx.fillText('Press P again to resume', canvas.width / 2, canvas.height / 2 + 20);
+        ctx.strokeText('Paused', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Paused', canvas.width / 2, canvas.height / 2);
     }
     if (pauseCountdown > 0) {
         ctx.font = `48px ${assets.font}`;
