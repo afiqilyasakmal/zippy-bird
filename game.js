@@ -260,8 +260,13 @@ function draw() {
     if (!assets.background || !assets.bird || !assets.pipe || !assets.ground) return;
     // Draw background
     ctx.drawImage(assets.background, 0, 0, canvas.width, canvas.height);
-    // Draw bird
-    ctx.drawImage(assets.bird, bird.x, bird.y, bird.width, bird.height);
+    // Calculate bird rotation based on velocity
+    let birdRotation = Math.min(Math.max(bird.velocity * 3, -30), 30); // Clamp rotation between -30 and 30 degrees
+    ctx.save(); // Save the current state
+    ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2); // Move to the bird's center
+    ctx.rotate(birdRotation * Math.PI / 180); // Rotate the canvas
+    ctx.drawImage(assets.bird, -bird.width / 2, -bird.height / 2, bird.width, bird.height); // Draw the bird
+    ctx.restore(); // Restore the original state
     // Draw pipes
     pipes.forEach(pipe => {
         ctx.drawImage(assets.pipe, pipe.x, 0, PIPE_WIDTH, pipe.gapY);
