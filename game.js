@@ -14,6 +14,7 @@ const assets = {
     background: null,
     ground: null,
     jumpSound: null,
+    gameOverSound: null,
     font: null
 };
 
@@ -31,6 +32,7 @@ let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameStarted = false;
 let gameOver = false;
+let gameOverSoundPlayed = false;
 
 // Initialize game
 // Load game assets
@@ -59,7 +61,7 @@ async function loadAssets() {
         assets.background = await loadImage('assets/background.svg');
         assets.ground = await loadImage('assets/ground.svg');
         assets.jumpSound = await loadAudio('assets/jump.wav');
-        
+        assets.gameOverSound = await loadAudio('assets/game-over.mp3');
         // Load retro font
         try {
             const font = new FontFace('Press Start 2P', 'url(assets/PressStart2P-Regular.ttf)');
@@ -130,8 +132,7 @@ function handleClick() {
 function spawnPipe() {
     if (!gameStarted || gameOver) return;
     
-    const gapY = Math.random() * (canvas.height - PIPE_GAP - 100) + 50;
-    
+    const gapY = Math.floor(Math.random() * (canvas.height - PIPE_GAP - 100)) + 50;
     pipes.push({
         x: canvas.width,
         gapY: gapY,
@@ -149,7 +150,14 @@ function update() {
     
     // Check collisions
     if (bird.y < 0 || bird.y > canvas.height) {
-        gameOver = true;
+        if (!gameOver) {
+            gameOver = true;
+            if (assets.gameOverSound && !gameOverSoundPlayed) {
+                assets.gameOverSound.currentTime = 0;
+                assets.gameOverSound.play().catch(error => console.error('Error playing game over sound:', error));
+                gameOverSoundPlayed = true;
+            }
+        }
     }
     
     if (!gameOver) {
@@ -169,7 +177,14 @@ function update() {
                 bird.x < pipe.x + PIPE_WIDTH &&
                 (bird.y < pipe.gapY || bird.y + BIRD_SIZE > pipe.gapY + PIPE_GAP)
             ) {
-                gameOver = true;
+                if (!gameOver) {
+                    gameOver = true;
+                    if (assets.gameOverSound && !gameOverSoundPlayed) {
+                        assets.gameOverSound.currentTime = 0;
+                        assets.gameOverSound.play().catch(error => console.error('Error playing game over sound:', error));
+                        gameOverSoundPlayed = true;
+                    }
+                }
             }
         });
         
@@ -232,11 +247,21 @@ function draw() {
     
     // Draw start message
     if (!gameStarted) {
-        ctx.font = `20px ${assets.font}`;
+        // Draw the title in two rows above the start message
+        ctx.font = `32px ${assets.font}`;
         ctx.textAlign = 'center';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4;
         ctx.fillStyle = '#fff';
+        // First row: "ZIPPY"
+        ctx.strokeText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90);
+        ctx.fillText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90);
+        // Second row: "BIRD"
+        ctx.strokeText('BIRD', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.fillText('BIRD', canvas.width / 2, canvas.height / 2 - 50);
+        // Draw the start message below the title
+        ctx.font = `20px ${assets.font}`;
+        ctx.lineWidth = 3;
         ctx.strokeText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
     }
@@ -261,6 +286,7 @@ function resetGame() {
     score = 0;
     gameStarted = false;
     gameOver = false;
+    gameOverSoundPlayed = false;
 }
 
 // Start the game
