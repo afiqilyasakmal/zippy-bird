@@ -1,9 +1,9 @@
 // Game constants
 const BASE_WIDTH = 360;
 const BASE_HEIGHT = 640;
-const GRAVITY = 0.55;
+const GRAVITY = 0.6;
 const FLAP_SPEED = -8;
-const PIPE_SPEED = 2;
+const PIPE_SPEED = 4;
 const PIPE_SPAWN_INTERVAL = 1500;
 let BIRD_SIZE = 100;
 let PIPE_WIDTH = 80;
