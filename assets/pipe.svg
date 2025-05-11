@@ -1,0 +1,11 @@
+<svg width="50" height="800" viewBox="0 0 50 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pipeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2E8B57"/>
+      <stop offset="100%" style="stop-color:#3CB371"/>
+    </linearGradient>
+  </defs>
+  <path d="M0,0 H50 V800 H0 V0 Z" fill="url(#pipeGradient)"/>
+  <rect x="0" y="0" width="50" height="30" fill="#2E8B57"/>
+  <rect x="0" y="770" width="50" height="30" fill="#2E8B57"/>
+</svg>
