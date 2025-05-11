@@ -200,7 +200,9 @@ function update() {
     bird.y += bird.velocity;
     
     // Check collisions
-    if (bird.y < 0 || bird.y > canvas.height) {
+    if (bird.y < 0 || bird.y + bird.height > canvas.height - 100 * (canvas.height / BASE_HEIGHT)) {
+        bird.velocity = 0; // Stop bird movement
+        bird.y = canvas.height - bird.height - 100 * (canvas.height / BASE_HEIGHT); // Ensure bird stays at ground level
         if (!gameOver) {
             gameOver = true;
             if (assets.gameOverSound && !gameOverSoundPlayed) {
