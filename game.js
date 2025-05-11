@@ -15,7 +15,8 @@ const assets = {
     ground: null,
     jumpSound: null,
     gameOverSound: null,
-    font: null
+    font: null,
+    scoreSound: null
 };
 
 // Game variables
@@ -33,6 +34,10 @@ let highScore = localStorage.getItem('highScore') || 0;
 let gameStarted = false;
 let gameOver = false;
 let gameOverSoundPlayed = false;
+let pause = false;
+let pauseCountdown = 0;
+let pauseCountdownInterval = null;
+let pauseResumeCallback = null;
 
 // Initialize game
 // Load game assets
@@ -62,6 +67,7 @@ async function loadAssets() {
         assets.ground = await loadImage('assets/ground.svg');
         assets.jumpSound = await loadAudio('assets/jump.wav');
         assets.gameOverSound = await loadAudio('assets/game-over.mp3');
+        assets.scoreSound = await loadAudio('assets/score.wav');
         // Load retro font
         try {
             const font = new FontFace('Press Start 2P', 'url(assets/PressStart2P-Regular.ttf)');
@@ -100,6 +106,7 @@ async function init() {
     document.addEventListener('click', handleClick);
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') handleClick();
+        if (e.code === 'KeyP') handlePause();
     });
     
     // Start game loop
@@ -142,7 +149,7 @@ function spawnPipe() {
 
 // Update game state
 function update() {
-    if (!gameStarted) return;
+    if (!gameStarted || pause || pauseCountdown > 0) return;
 
     // Update bird position
     bird.velocity += GRAVITY;
@@ -169,6 +176,10 @@ function update() {
             if (!pipe.passed && bird.x > pipe.x + PIPE_WIDTH) {
                 pipe.passed = true;
                 score++;
+                if (assets.scoreSound) {
+                    assets.scoreSound.currentTime = 0;
+                    assets.scoreSound.play().catch(error => console.error('Error playing score sound:', error));
+                }
             }
             
             // Check collision with pipes
@@ -194,6 +205,26 @@ function update() {
 }
 
 // Draw game objects
+function handlePause() {
+    if (gameOver || !gameStarted) return;
+    if (!pause) {
+        pause = true;
+        pauseCountdown = 0;
+        clearInterval(pauseCountdownInterval);
+    } else {
+        // Start countdown before resuming
+        pauseCountdown = 3;
+        pauseCountdownInterval = setInterval(() => {
+            pauseCountdown--;
+            if (pauseCountdown <= 0) {
+                clearInterval(pauseCountdownInterval);
+                pause = false;
+                pauseCountdown = 0;
+            }
+        }, 1000);
+    }
+}
+
 function draw() {
     if (!assets.background || !assets.bird || !assets.pipe || !assets.ground) return;
 
@@ -276,6 +307,28 @@ function draw() {
         ctx.strokeText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
     }
+    // Draw pause overlay
+    if (pause && pauseCountdown === 0) {
+        ctx.font = `32px ${assets.font}`;
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 3;
+        ctx.fillStyle = '#fff';
+        ctx.strokeText('Paused', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillText('Paused', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = `16px ${assets.font}`;
+        ctx.strokeText('Press P again to resume', canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText('Press P again to resume', canvas.width / 2, canvas.height / 2 + 20);
+    }
+    if (pauseCountdown > 0) {
+        ctx.font = `48px ${assets.font}`;
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 4;
+        ctx.fillStyle = '#fff';
+        ctx.strokeText(pauseCountdown, canvas.width / 2, canvas.height / 2);
+        ctx.fillText(pauseCountdown, canvas.width / 2, canvas.height / 2);
+    }
 }
 
 // Game loop
@@ -298,6 +351,9 @@ function resetGame() {
     gameStarted = false;
     gameOver = false;
     gameOverSoundPlayed = false;
+    pause = false;
+    pauseCountdown = 0;
+    clearInterval(pauseCountdownInterval);
 }
 
 // Start the game
