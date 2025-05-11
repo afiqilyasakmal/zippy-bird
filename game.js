@@ -4,8 +4,8 @@ const FLAP_SPEED = -8;
 const PIPE_SPEED = 2;
 const PIPE_SPAWN_INTERVAL = 1500;
 const BIRD_SIZE = 50;
-const PIPE_WIDTH = 50;
-const PIPE_GAP = 150;
+const PIPE_WIDTH = 80;
+const PIPE_GAP = 200;
 
 // Game assets
 const assets = {
@@ -138,7 +138,7 @@ function handleClick() {
 // Spawn new pipe
 function spawnPipe() {
     if (!gameStarted || gameOver) return;
-    const MIN_PIPE_DISTANCE = 180; // Minimum horizontal distance between pipes
+    const MIN_PIPE_DISTANCE = 260; // Minimum horizontal distance between pipes (wider spacing)
     // Only spawn if no pipes or last pipe is far enough to the left
     if (pipes.length > 0) {
         const lastPipe = pipes[pipes.length - 1];
@@ -146,7 +146,10 @@ function spawnPipe() {
             return;
         }
     }
-    const gapY = Math.floor(Math.random() * (canvas.height - PIPE_GAP - 100)) + 50;
+    // Ensure the gapY leaves enough room for the new larger gap and pipe width
+    const minPipeHeight = 60;
+    const maxGapY = canvas.height - PIPE_GAP - minPipeHeight;
+    const gapY = Math.floor(Math.random() * (maxGapY - minPipeHeight + 1)) + minPipeHeight;
     pipes.push({
         x: canvas.width,
         gapY: gapY,
