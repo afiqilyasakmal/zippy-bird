@@ -5,7 +5,7 @@ const GRAVITY = 0.5;
 const FLAP_SPEED = -8;
 const PIPE_SPEED = 2;
 const PIPE_SPAWN_INTERVAL = 1500;
-let BIRD_SIZE = 50;
+let BIRD_SIZE = 100;
 let PIPE_WIDTH = 80;
 let PIPE_GAP = 200;
 
@@ -172,7 +172,7 @@ function handleClick() {
 // Spawn new pipe
 function spawnPipe() {
     if (!gameStarted || gameOver) return;
-    const MIN_PIPE_DISTANCE = 260; // Minimum horizontal distance between pipes (wider spacing)
+    const MIN_PIPE_DISTANCE = 200; // Minimum horizontal distance between pipes (wider spacing)
     // Only spawn if no pipes or last pipe is far enough to the left
     if (pipes.length > 0) {
         const lastPipe = pipes[pipes.length - 1];
@@ -302,9 +302,40 @@ function draw() {
         ctx.fillStyle = '#fff';
         ctx.strokeText('Game Over!', canvas.width / 2, canvas.height / 2);
         ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
-        ctx.font = `${16 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
-        ctx.strokeText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
-        ctx.fillText('Click or press Space to restart', canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
+        // Dynamically adjust font size for restart message
+        let restartMsg = 'Click or press Space to restart';
+        let fontSize = 16 * (canvas.height / BASE_HEIGHT);
+        ctx.font = `${fontSize}px ${assets.font}`;
+        let msgWidth = ctx.measureText(restartMsg).width;
+        // Reduce font size if still too wide, but not below 10px
+        while (msgWidth > canvas.width * 0.9 && fontSize > 10) {
+            fontSize -= 1;
+            ctx.font = `${fontSize}px ${assets.font}`;
+            msgWidth = ctx.measureText(restartMsg).width;
+        }
+        if (msgWidth > canvas.width * 0.9) {
+            // Split into two lines if still too wide
+            let line1 = 'Click or press Space';
+            let line2 = 'to restart';
+            // Adjust font size for split lines
+            fontSize = 16 * (canvas.height / BASE_HEIGHT);
+            ctx.font = `${fontSize}px ${assets.font}`;
+            let line1Width = ctx.measureText(line1).width;
+            let line2Width = ctx.measureText(line2).width;
+            while ((line1Width > canvas.width * 0.9 || line2Width > canvas.width * 0.9) && fontSize > 10) {
+                fontSize -= 1;
+                ctx.font = `${fontSize}px ${assets.font}`;
+                line1Width = ctx.measureText(line1).width;
+                line2Width = ctx.measureText(line2).width;
+            }
+            ctx.strokeText(line1, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+            ctx.fillText(line1, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+            ctx.strokeText(line2, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+            ctx.fillText(line2, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+        } else {
+            ctx.strokeText(restartMsg, canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
+            ctx.fillText(restartMsg, canvas.width / 2, canvas.height / 2 + 40 * (canvas.height / BASE_HEIGHT));
+        }
     }
     // Draw start message
     if (!gameStarted) {
@@ -317,10 +348,41 @@ function draw() {
         ctx.fillText('ZIPPY', canvas.width / 2, canvas.height / 2 - 90 * (canvas.height / BASE_HEIGHT));
         ctx.strokeText('BIRD', canvas.width / 2, canvas.height / 2 - 50 * (canvas.height / BASE_HEIGHT));
         ctx.fillText('BIRD', canvas.width / 2, canvas.height / 2 - 50 * (canvas.height / BASE_HEIGHT));
-        ctx.font = `${20 * (canvas.height / BASE_HEIGHT)}px ${assets.font}`;
+        // Adaptive start message
+        let startMsg = 'Click or press Space to start';
+        let fontSize = 20 * (canvas.height / BASE_HEIGHT);
+        ctx.font = `${fontSize}px ${assets.font}`;
         ctx.lineWidth = 3 * (canvas.height / BASE_HEIGHT);
-        ctx.strokeText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
-        ctx.fillText('Click or press Space to start', canvas.width / 2, canvas.height / 2);
+        let msgWidth = ctx.measureText(startMsg).width;
+        // Reduce font size if too wide, but not below 10px
+        while (msgWidth > canvas.width * 0.9 && fontSize > 10) {
+            fontSize -= 1;
+            ctx.font = `${fontSize}px ${assets.font}`;
+            msgWidth = ctx.measureText(startMsg).width;
+        }
+        if (msgWidth > canvas.width * 0.9) {
+            // Split into two lines if still too wide
+            let line1 = 'Click or press Space';
+            let line2 = 'to start';
+            // Adjust font size for split lines
+            fontSize = 20 * (canvas.height / BASE_HEIGHT);
+            ctx.font = `${fontSize}px ${assets.font}`;
+            let line1Width = ctx.measureText(line1).width;
+            let line2Width = ctx.measureText(line2).width;
+            while ((line1Width > canvas.width * 0.9 || line2Width > canvas.width * 0.9) && fontSize > 10) {
+                fontSize -= 1;
+                ctx.font = `${fontSize}px ${assets.font}`;
+                line1Width = ctx.measureText(line1).width;
+                line2Width = ctx.measureText(line2).width;
+            }
+            ctx.strokeText(line1, canvas.width / 2, canvas.height / 2);
+            ctx.fillText(line1, canvas.width / 2, canvas.height / 2);
+            ctx.strokeText(line2, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+            ctx.fillText(line2, canvas.width / 2, canvas.height / 2 + 0.1 * canvas.height);
+        } else {
+            ctx.strokeText(startMsg, canvas.width / 2, canvas.height / 2);
+            ctx.fillText(startMsg, canvas.width / 2, canvas.height / 2);
+        }
     }
     // Draw pause overlay
     if (pause) {
