@@ -138,7 +138,14 @@ function handleClick() {
 // Spawn new pipe
 function spawnPipe() {
     if (!gameStarted || gameOver) return;
-    
+    const MIN_PIPE_DISTANCE = 180; // Minimum horizontal distance between pipes
+    // Only spawn if no pipes or last pipe is far enough to the left
+    if (pipes.length > 0) {
+        const lastPipe = pipes[pipes.length - 1];
+        if (lastPipe.x > canvas.width - MIN_PIPE_DISTANCE) {
+            return;
+        }
+    }
     const gapY = Math.floor(Math.random() * (canvas.height - PIPE_GAP - 100)) + 50;
     pipes.push({
         x: canvas.width,
