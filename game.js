@@ -90,18 +90,33 @@ async function init() {
     // Load assets before starting the game
     await loadAssets();
 
-    // Set canvas size to be responsive
+    // Set canvas size to be responsive and scale game elements
     function resizeCanvas() {
-        const height = window.innerHeight;
-        const aspectRatio = 1;
+        // Use device width and height, minus some padding for mobile browser UI
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        // Maintain aspect ratio (portrait for mobile, square for desktop)
+        let aspectRatio = 9 / 16; // Portrait
+        if (width / height > aspectRatio) {
+            width = height * aspectRatio;
+        } else {
+            height = width / aspectRatio;
+        }
+        canvas.width = width;
         canvas.height = height;
-        canvas.width = height / aspectRatio;
+        // Optionally, scale all game objects here if needed
     }
     
     // Initial resize and add listener for window changes
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
+    // Touch event support for mobile
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        handleClick();
+    }, { passive: false });
+
     // Event listeners
     document.addEventListener('click', handleClick);
     document.addEventListener('keydown', (e) => {
