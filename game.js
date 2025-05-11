@@ -3,7 +3,7 @@ const GRAVITY = 0.5;
 const FLAP_SPEED = -8;
 const PIPE_SPEED = 2;
 const PIPE_SPAWN_INTERVAL = 1500;
-const BIRD_SIZE = 40;
+const BIRD_SIZE = 50;
 const PIPE_WIDTH = 50;
 const PIPE_GAP = 150;
 
