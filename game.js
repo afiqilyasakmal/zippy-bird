@@ -1,7 +1,7 @@
 // Game constants
 const BASE_WIDTH = 360;
 const BASE_HEIGHT = 640;
-const GRAVITY = 0.5;
+const GRAVITY = 0.55;
 const FLAP_SPEED = -8;
 const PIPE_SPEED = 2;
 const PIPE_SPAWN_INTERVAL = 1500;
