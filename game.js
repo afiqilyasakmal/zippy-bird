@@ -199,8 +199,9 @@ function update() {
     bird.velocity += GRAVITY;
     bird.y += bird.velocity;
     
-    // Check collisions
-    if (bird.y < 0 || bird.y + bird.height > canvas.height - 100 * (canvas.height / BASE_HEIGHT)) {
+    // Calculate bird rotation based on velocity
+    let birdRotation = Math.min(Math.max(bird.velocity * 3, -30), 30); // Clamp rotation between -30 and 30 degrees
+    if (bird.y + bird.height > canvas.height - 100 * (canvas.height / BASE_HEIGHT)) {
         bird.velocity = 0; // Stop bird movement
         bird.y = canvas.height - bird.height - 100 * (canvas.height / BASE_HEIGHT); // Ensure bird stays at ground level
         if (!gameOver) {
